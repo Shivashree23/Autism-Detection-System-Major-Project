@@ -2,6 +2,7 @@ import Logo from '@/assets/Images/Logo.png';
 import NavBar from './NavBar';
 import { useState, useEffect } from 'react';
 import { SelectedPage } from '@/Components/Shared/Types';
+import { useAuth } from '../../contexts/AuthContext'; // ✅ correct import
 
 const Header = () => {
   const [selectedPage, setSelectedPage] = useState<SelectedPage>(
@@ -10,14 +11,18 @@ const Header = () => {
   const [isTopOfPage, setIsTopOfPage] = useState<boolean>(true);
   const flexBetween = 'flex items-center justify-between';
 
+  const { logout, user } = useAuth(); // ✅ Now this is valid — inside the component
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY === 0) {
         setIsTopOfPage(true);
         setSelectedPage(SelectedPage.Home);
+      } else {
+        setIsTopOfPage(false);
       }
-      if (window.scrollY !== 0) setIsTopOfPage(false);
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -34,6 +39,11 @@ const Header = () => {
         selectedPage={selectedPage}
         setSelectedPage={setSelectedPage}
       />
+      {user && (
+        <button onClick={logout} className="text-sm underline">
+          Log Out
+        </button>
+      )}
     </div>
   );
 };
